@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>AirCrypto</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <h3>Credit Top-Up</h3>
+
+    <ion-list>
+      <!-- EMAIL -->
+      <ion-item>
+        <ion-label color="primary">Email</ion-label>
+        <ion-input id="email" placeholder="e.g user@gmail.com" type="email"  [(ngModel)]="email"></ion-input>
+      </ion-item>
+
+      <!-- PAYMENT METHOD -->
+      <ion-item>
+        <ion-label color="primary">Payment method</ion-label>
+        <ion-select  (ionChange)="showAmount()" >
+          <ion-option value="crypto">Crypto-top-up</ion-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- FIAT  & CRYPTO -->
+      <ion-item *ngIf="inputAmount">
+        <ion-label color="primary">Amount selection</ion-label>
+        <ion-select (ionChange)="showCurrency()" [(ngModel)]="type">
+          <ion-option value="FIAT">FIAT</ion-option>
+          <ion-option value="CRYPTO">CRYPTO</ion-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- FIAT -->
+      <ion-list *ngIf="showFiat">
+        <ion-item>
+          <ion-label color="primary">Amount</ion-label>
+          <ion-input id="fiatAmount" placeholder="e.g 100" type="number"  [(ngModel)]="amount"></ion-input>
+          <span item-end>AUD</span>
+
+        </ion-item>
+
+          <ion-item >
+            <ion-label color="primary">Currency</ion-label>
+            <ion-select placeholder="e.g BTC" (ionChange)="getRate()" [(ngModel)]="secondaryCurrency">
+              <ion-option *ngFor="let item of cryptoCurrency" value="{{[item]}}">{{[item]}}</ion-option>
+            </ion-select>
+          </ion-item>
+
+
+      </ion-list>
+
+      <!-- CRYPTO -->
+      <ion-list *ngIf="showCrypto">
+        <ion-item >
+          <ion-label color="primary">Amount</ion-label>
+          <ion-input id="cryptoAmount" placeholder="e.g 100" type="number"  [(ngModel)]="amount"></ion-input>
+          <ion-select placeholder="e.g BTC" (ionChange)="getRate()" [(ngModel)]="primaryCurrency">
+            <ion-option *ngFor="let item of cryptoCurrency" value="{{[item]}}">{{[item]}}</ion-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label color="primary">Currency</ion-label>
+          <span item-end>AUD</span>
+        </ion-item>
+      </ion-list>
+
+      <!-- RESPONSE -->
+      <ion-item *ngIf="quoteResponse">
+        <ion-label id="quoteResponse"> </ion-label>
+      </ion-item>
+
+      <!-- CONFIRM BUTTON -->
+      <ion-item *ngIf="confirmQuote">
+        <button ion-button (click)="createPayment()">Confirm</button>
+      </ion-item>
+
+      <!-- GET STATUS BUTTON -->
+      <ion-item *ngIf="status">
+        <button ion-button (click)="paymentStatus()">Check status</button>
+      </ion-item>
+
+
+    </ion-list>
+
+
+
+
+</ion-content>
