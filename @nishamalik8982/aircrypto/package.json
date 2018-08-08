@@ -1,0 +1,43 @@
+{
+  "name": "aircrypto",
+  "version": "1.0.0",
+  "description": "Payments in crypto for top-up",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nishamalik8982/AirCrypto.git"
+  },
+  "keywords": [
+    "Top-up",
+    "Crypto",
+    "AUD"
+  ],
+  "author": "Nisha Malik",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nishamalik8982/AirCrypto/issues"
+  },
+  "homepage": "https://github.com/nishamalik8982/AirCrypto#readme",
+  "devDependencies": {
+    "window": "^4.2.5"
+  },
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "bluebird": "^3.5.1",
+    "crypto": "^1.0.1",
+    "crypto-js": "^3.1.9-1",
+    "dateformat": "^3.0.3",
+    "express": "^4.16.3",
+    "hi-base64": "^0.2.1",
+    "i": "^0.3.6",
+    "json-serialize": "^1.1.3",
+    "random-number-csprng": "^1.0.2",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "secure-random": "^1.1.1",
+    "utf8": "^3.0.0"
+  }
+}
