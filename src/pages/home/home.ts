@@ -1,11 +1,7 @@
 import { Component } from '@angular/core';
 import {Alert, NavController, NavParams} from 'ionic-angular';
-import { getQuote, createPayment, paymentStatus } from '@nishamalik8982/aircrypto';
+import { AirCrypto } from '@lakeba-solutions/aircryptolib';
 import { HttpClient,HttpErrorResponse } from '@angular/common/http';
-import { Select } from 'ionic-angular';
-import { ViewChild } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import {FormBuilder, FormGroup, Validators, AbstractControl} from "@angular/forms";
 
 @Component({
   selector: 'page-home',
@@ -13,36 +9,52 @@ import {FormBuilder, FormGroup, Validators, AbstractControl} from "@angular/form
 })
 
 export class HomePage {
-
+  public airCrypto:any = new AirCrypto("CFF7D059-5EFC-49B2-BD18-B937261943B5","b25c9ae6f91d4c9f948b67ec00113456");
   // List of cryptocurrencies
   public  cryptoCurrency:Array<string> = ["ETH", "BTC", "LTC", "BCH"];
 
-  // To
+  // Currency type
   public type:string = ""; // FIAT or CRYPTO
 
-  // To display/hide input field
-  public showCrypto:boolean = false;
-  public showFiat:boolean = false;
-
-
-
-
-
-
-  @ViewChild('selectCrypto') selectCrypto: Select;
+  // To display/hide input field (default: hidden)
+  public showCrypto:boolean = false; // show currency in crypto
+  public showFiat:boolean = false;  //  show currency in fiat
 
   // Currencies
   public primaryCurrency:string = "";
   public secondaryCurrency:string = "";
+
+  // if true --> primaryCurrency is crypto and secondaryCurrency is fiat, else the other way around
   public secondaryCurrencyIsFiat:boolean = false;
+
+  // amount (either in crypto or fiat)
   public amount:number = null;
+
+  // To display/hide the response of function getQuote
   public quoteResponse:boolean = false;
+
+  // To display/hide status button
   public status: boolean = false;
+
+  // email
   public email:string = "";
+
+  // quoted amount from getQuote
   public quotedAmount:number = null;
+
+  // To display/hide amount input field
   public inputAmount: boolean = false;
+
+  // To Display/hide confrm button
   public confirmQuote: boolean = false;
 
+  // Currency to pass to the createPayment() function. Can be either primaryCurrency or secondaryCurrency (the one in AUD)
+  public currency:string = "";
+
+  // Amount to pass to the createPayment() function. It can be this.amount or this.quotedAmount (the one in AUD)
+  public amountAUD:number = null;
+
+  // To store info from payment
   private Payment:any = {
     ID: null,
     address: "",
@@ -54,8 +66,6 @@ export class HomePage {
               {
 
               }
-
-
 
 
   showCurrency() {
@@ -114,7 +124,7 @@ export class HomePage {
     console.log(this.amount, this.primaryCurrency, this.secondaryCurrency);
     document.getElementById('quoteResponse').textContent = 'Getting quote...';
     this.showButtons();
-    getQuote(this.amount, this.primaryCurrency, this.secondaryCurrency).then(function (res) {
+    this.airCrypto.getQuote(this.amount, this.primaryCurrency, this.secondaryCurrency).then(function (res) {
       document.getElementById('quoteResponse').textContent = 'Your quote: ' + that.amount + ' ' + that.primaryCurrency.toString() + ' = ' + res + ' ' + that.secondaryCurrency;
       that.quotedAmount = res;
     }).catch(function (e) {
@@ -122,51 +132,38 @@ export class HomePage {
     });
   }
 
-
-  public createPayment() {
+  public makePayment() {
     // If    30 < AUD < 1000
     if (this.amountIsInRange()) {
       let that = this;
       if (this.secondaryCurrencyIsFiat) {
-        createPayment(this.email, this.primaryCurrency, this.quotedAmount).then(function (res) {
-          console.log(that.email, that.primaryCurrency, that.quotedAmount);
-          let response = JSON.parse(res);
-          that.Payment = {
-            ID: response.Data.PaymentID,
-            address: response.Data.CryptoAddress,
-            cryptoAmount: response.Data.CryptoAmount
-          };
-          alert(
-            "\npaymentID:   " + that.Payment.ID +
-            "\ncryptoAddress:   " + that.Payment.address +
-            "\ncryptoAmount:   " + that.Payment.cryptoAmount + "  " + that.primaryCurrency);
-        }).catch(function (e) {
-          alert(e.message);
-        });
+        this.currency = this.primaryCurrency;
+        this.amountAUD = this.quotedAmount;
       } else {
-        createPayment(this.email, this.secondaryCurrency, this.amount).then(function (res) {
-          let response = JSON.parse(res);
-          that.Payment = {
-            ID: response.Data.PaymentID,
-            address: response.Data.CryptoAddress,
-            cryptoAmount: response.Data.CryptoAmount
-          };
-          alert(
-            "\npaymentID:   " + that.Payment.ID +
-            "\ncryptoAddress:   " + that.Payment.address +
-            "\ncryptoAmount:   " + that.Payment.cryptoAmount + "  " + that.secondaryCurrency);
-        }).catch(function (e) {
-          alert(e.message);
-        });
+        this.currency = this.secondaryCurrency;
+        this.amountAUD = this.amount;
       }
+      this.airCrypto.createPayment(this.email, this.currency, this.amountAUD).then(function (res) {
+        let response = JSON.parse(res);
+        that.Payment = {
+          ID: response.Data.PaymentID,
+          address: response.Data.CryptoAddress,
+          cryptoAmount: response.Data.CryptoAmount
+        };
+        alert(
+          "\npaymentID:   " + that.Payment.ID +
+          "\ncryptoAddress:   " + that.Payment.address +
+          "\ncryptoAmount:   " + that.Payment.cryptoAmount + "  " + that.primaryCurrency);
+      }).catch(function (e) {
+        alert(e.message);
+      });
     } else return;
   }
 
-
-  public paymentStatus() {
+  public getStatus() {
     if (this.amountIsInRange()) {
       let that = this;
-      paymentStatus(that.Payment.ID).then(function (res) {
+      this.airCrypto.paymentStatus(that.Payment.ID).then(function (res) {
         let response = JSON.parse(res);
         let TransactionStatus = response.Data.Status;
         alert("\nPayment Status:   " + TransactionStatus);
