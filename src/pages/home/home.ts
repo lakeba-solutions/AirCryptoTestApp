@@ -125,8 +125,9 @@ export class HomePage {
     document.getElementById('quoteResponse').textContent = 'Getting quote...';
     this.showButtons();
     this.airCrypto.getQuote(this.amount, this.primaryCurrency, this.secondaryCurrency).then(function (res) {
-      document.getElementById('quoteResponse').textContent = 'Your quote: ' + that.amount + ' ' + that.primaryCurrency.toString() + ' = ' + res + ' ' + that.secondaryCurrency;
-      that.quotedAmount = res;
+      var result = JSON.parse(res);
+      document.getElementById('quoteResponse').textContent = 'Your quote: ' + that.amount + ' ' + that.primaryCurrency.toString() + ' = ' + result.QUOTE.toFixed(2) + ' ' + that.secondaryCurrency;
+      that.quotedAmount = result.QUOTE;
     }).catch(function (e) {
       alert(e.message);
     });
